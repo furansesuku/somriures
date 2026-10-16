@@ -198,3 +198,95 @@ button:active {
 @media (max-width: 420px) {
   .hud { font-size: 0.95rem; }
 }
+
+/* Formulari per desar el nom (pantalla final) */
+.guardar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.guardar[hidden] {
+  display: none;
+}
+
+.guardar input {
+  width: 9.5em;
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 2px solid var(--red);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.estat-ranking {
+  margin: 0;
+  font-weight: 700;
+  color: var(--red);
+}
+
+.estat-ranking[hidden] {
+  display: none;
+}
+
+/* Classificació */
+.ranking {
+  margin-top: 14px;
+  padding: 10px 14px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+}
+
+.ranking h2 {
+  margin: 0 0 8px;
+  text-align: center;
+  color: var(--red);
+  font-size: 1.3rem;
+}
+
+.ranking-taula {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.05rem;
+}
+
+.ranking-taula th {
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 2px 8px;
+}
+
+.ranking-taula td {
+  padding: 6px 8px;
+  border-top: 1px solid color-mix(in srgb, var(--fg) 15%, transparent);
+}
+
+.ranking-taula th:first-child,
+.ranking-taula td:first-child {
+  width: 2.2em;
+}
+
+.ranking-taula th:last-child,
+.ranking-taula td.punts {
+  text-align: right;
+  font-weight: 700;
+}
+
+.ranking-taula tr.meva td {
+  background: var(--red);
+  color: #fff;
+}
+
+.ranking-nota {
+  margin: 8px 0 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.ranking-nota[hidden] {
+  display: none;
+}

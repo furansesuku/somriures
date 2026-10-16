@@ -74,6 +74,8 @@ function empezar() {
   elResultat.hidden = true;
   elPuntsFinal.hidden = true;
   elConversio.hidden = true;
+  boxGuardar.hidden = true;
+  estatRanking.hidden = true;
   elApadrinar.hidden = true;
   actualizarMarcadores();
   requestAnimationFrame(bucle);
@@ -95,6 +97,16 @@ function terminar() {
     elConversio.textContent = "Amb " + PUNTS_PER_EURO + " punts o m\u00e9s podr\u00e0s convertir-los en euros de somriures. Torna-ho a provar!";
   }
   elConversio.hidden = false;
+  guardat = false;
+  btnGuardar.disabled = false;
+  estatRanking.hidden = true;
+  if (score > 0) {
+    inputNom.value = nomRecordat();
+    boxGuardar.hidden = false;
+  } else {
+    boxGuardar.hidden = true;
+  }
+  cargarRanking(null);
   elApadrinar.href = ENLACE_APADRINAR;
   elApadrinar.hidden = false;
   btn.textContent = "Tornar a jugar";
@@ -200,5 +212,94 @@ cv.addEventListener("pointerdown", function (e) {
   }
 });
 
+// ---------- Classificació (taula de posicions) ----------
+// El servidor (server.py) guarda la classificació; aquí només es demana i es mostra.
+var URL_RANKING = "api/ranking";   // relatiu a la pàgina: .../festeve/somriures/api/ranking
+var FILES_RANKING = 7;
+var cosRanking = document.getElementById("cosRanking");
+var notaRanking = document.getElementById("notaRanking");
+var boxGuardar = document.getElementById("guardar");
+var inputNom = document.getElementById("nom");
+var btnGuardar = document.getElementById("btnGuardar");
+var estatRanking = document.getElementById("estatRanking");
+var guardat = false;
+
+function nomRecordat() {
+  try { return localStorage.getItem("somriures_nom") || ""; } catch (e) { return ""; }
+}
+
+function pintarRanking(llista, destacada) {
+  cosRanking.textContent = "";
+  for (var i = 0; i < FILES_RANKING; i++) {
+    var e = llista && llista[i];
+    var tr = document.createElement("tr");
+    if (destacada === i + 1) tr.className = "meva";
+    var tdPos = document.createElement("td");
+    var tdNom = document.createElement("td");
+    var tdPunts = document.createElement("td");
+    tdPos.textContent = i + 1;
+    tdNom.textContent = e ? e.nom : "\u2014";     // textContent: el nom mai s'interpreta com a HTML
+    tdPunts.textContent = e ? e.punts : "";
+    tdPunts.className = "punts";
+    tr.appendChild(tdPos); tr.appendChild(tdNom); tr.appendChild(tdPunts);
+    cosRanking.appendChild(tr);
+  }
+}
+
+function cargarRanking(destacada) {
+  fetch(URL_RANKING, { cache: "no-store" })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (d) {
+      pintarRanking(d.ranking, destacada);
+      notaRanking.hidden = true;
+    })
+    .catch(function () {
+      notaRanking.textContent = "No s'ha pogut carregar la classificaci\u00f3.";
+      notaRanking.hidden = false;
+    });
+}
+
+function guardarPuntuacio() {
+  if (guardat || score <= 0) return;
+  var nom = inputNom.value.trim();
+  guardat = true;
+  btnGuardar.disabled = true;
+  try { localStorage.setItem("somriures_nom", nom); } catch (e) {}
+
+  fetch(URL_RANKING, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nom: nom, punts: score })
+  })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (d) {
+      pintarRanking(d.ranking, d.posicio);
+      notaRanking.hidden = true;
+      boxGuardar.hidden = true;
+      if (!d.posicio) {
+        estatRanking.textContent = "Puntuaci\u00f3 desada!";
+      } else if (d.posicio <= FILES_RANKING) {
+        estatRanking.textContent = "Puntuaci\u00f3 desada! Ets el n\u00famero " + d.posicio + ".";
+      } else {
+        estatRanking.textContent = "Puntuaci\u00f3 desada! Has quedat a la posici\u00f3 " + d.posicio + ".";
+      }
+      estatRanking.hidden = false;
+      document.getElementById("rankingSec").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    })
+    .catch(function () {
+      guardat = false;
+      btnGuardar.disabled = false;
+      estatRanking.textContent = "No s'ha pogut desar. Torna-ho a provar.";
+      estatRanking.hidden = false;
+    });
+}
+
+btnGuardar.addEventListener("click", guardarPuntuacio);
+inputNom.addEventListener("keydown", function (e) {
+  if (e.key === "Enter") guardarPuntuacio();
+});
+
 btn.addEventListener("click", empezar);
 dibujar();
+pintarRanking([], null);
+cargarRanking(null);

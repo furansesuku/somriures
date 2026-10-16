@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Somriures - Riuada de nassos</title>
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
   <main class="wrap">
@@ -25,14 +25,29 @@
           <p class="resultat" id="resultat" hidden></p>
           <p class="resultat resultat-punts" id="resultatPunts" hidden></p>
           <p class="conversio" id="conversio" hidden></p>
+          <div class="guardar" id="guardar" hidden>
+            <input id="nom" type="text" maxlength="12" placeholder="El teu nom" autocomplete="off" aria-label="El teu nom">
+            <button id="btnGuardar" type="button">Desar</button>
+          </div>
+          <p class="estat-ranking" id="estatRanking" hidden></p>
           <a class="boto boto-apadrinar" id="apadrinar" href="https://www.stockcrowd.com/p2p/1799/Apadrinaunsomriure" target="_blank" rel="noopener" hidden>Apadrina un somriure</a>
           <button id="btn">Començar!</button>
         </div>
       </div>
     </div>
+
+    <section class="ranking" id="rankingSec">
+      <h2>Classificació</h2>
+      <table class="ranking-taula">
+        <thead><tr><th>#</th><th>Jugador</th><th>Punts</th></tr></thead>
+        <tbody id="cosRanking"></tbody>
+      </table>
+      <p class="ranking-nota" id="notaRanking" hidden></p>
+    </section>
+
     <img class="logos" src="logos.png" alt="#Riuadadenassos - Pallapupas">
   </main>
 
-  <script src="juego.js?v=8"></script>
+  <script src="juego.js?v=9"></script>
 </body>
 </html>
