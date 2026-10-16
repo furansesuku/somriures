@@ -2,8 +2,11 @@
 // Campaña solidaria a favor de Pallapupas.
 
 // ---------- Ajustes fáciles de cambiar ----------
-var ANCHO = 600;
-var ALTO = 800;
+// Mida del joc: es llegeix del <canvas> de index.html (width i height),
+// així no cal canviar-la també aquí.
+var cv = document.getElementById("cv");
+var ANCHO = cv.width;
+var ALTO = cv.height;
 var DURACION = 30;   // segundos de partida
 var PROB = 0.06;     // más alto = caen más narices
 var MENSAJE_FINAL = "Cada rialla compta! Ajuda els Pallapupas a seguir portant somriures als hospitals.";
@@ -18,7 +21,6 @@ var PUNTS_PER_MIDA = [
 var ENLACE_APADRINAR = "https://EL-TEU-ENLLAC-AQUI";
 
 // ---------- Elementos de la página ----------
-var cv = document.getElementById("cv");
 var ctx = cv.getContext("2d");
 var ov = document.getElementById("ov");
 var btn = document.getElementById("btn");
