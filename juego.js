@@ -19,7 +19,7 @@ var PUNTS_PER_MIDA = [
   { maxRadi: 999, punts: 1 }   // nassos grans
 ];
 // Enllaç del botó "Apadrina": canvia-ho pel teu enllaç quan el tinguis
-var ENLACE_APADRINAR = "https://EL-TEU-ENLLAC-AQUI";
+var ENLACE_APADRINAR = "https://www.stockcrowd.com/p2p/1799/Apadrinaunsomriure";
 
 // ---------- Elementos de la página ----------
 var ctx = cv.getContext("2d");
