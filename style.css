@@ -57,7 +57,7 @@ canvas {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 6 / 7;
+  aspect-ratio: 3 / 4;
   touch-action: manipulation;
   cursor: pointer;
 }
@@ -73,6 +73,16 @@ canvas {
   text-align: center;
   padding: 16px;
   background: color-mix(in srgb, var(--field) 88%, transparent);
+  overflow-y: auto;      /* si en algun mòbil no hi cap, es pot desplaçar */
+}
+
+/* Contingut centrat; si no hi cap, comença des de dalt i no es retalla */
+.panel {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .overlay[hidden] {
@@ -153,4 +163,11 @@ button:active {
   margin: 14px auto 0;
   background: #fff;
   border-radius: 10px;
+}
+
+/* Pantalles petites: contingut una mica més compacte */
+@media (max-width: 420px) {
+  .panel { gap: 8px; }
+  .msg { font-size: 0.95rem; }
+  button, .boto { padding: 10px 22px; font-size: 1rem; }
 }
