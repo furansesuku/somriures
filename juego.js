@@ -7,6 +7,7 @@
 var cv = document.getElementById("cv");
 var ANCHO = cv.width;
 var ALTO = cv.height;
+cv.style.aspectRatio = ANCHO + " / " + ALTO;   // evita que els nassos es vegin ovalats
 var DURACION = 30;   // segundos de partida
 var PROB = 0.06;     // más alto = caen más narices
 var MENSAJE_FINAL = "Cada rialla compta! Ajuda els Pallapupas a seguir portant somriures als hospitals.";
