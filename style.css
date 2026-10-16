@@ -1,0 +1,112 @@
+/* Colores del proyecto: cámbialos aquí para adaptarlos a la campaña */
+:root {
+  --bg: #fff4d6;
+  --field: #fff4d6;
+  --fg: #222;
+  --muted: #555;
+  --red: #e3201b;
+  --red-dark: #9b1410;
+  --shine: #ffb3b0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1d1a14;
+    --field: #2a261d;
+    --fg: #f3ecdc;
+    --muted: #bbb;
+    --red: #ff4b45;
+    --red-dark: #a01813;
+    --shine: #ffc9c6;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 600px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 4px 2px 8px;
+}
+
+.stage {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--field);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 16px;
+  background: color-mix(in srgb, var(--field) 88%, transparent);
+}
+
+.overlay[hidden] {
+  display: none;
+}
+
+h1 {
+  margin: 0;
+  color: var(--red);
+  font-size: clamp(1.8rem, 8vw, 2.6rem);
+}
+
+.tag {
+  color: var(--muted);
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.msg {
+  margin: 0;
+  max-width: 30ch;
+}
+
+button {
+  background: var(--red);
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.97);
+}
