@@ -144,12 +144,13 @@ button:active {
   border: 3px solid var(--red);
 }
 
-/* Imatge de la campanya (logos) a la part superior */
+/* Logo de la campanya: petit i discret, sota el joc */
 .logos {
   display: block;
   width: 100%;
+  max-width: 300px;      /* canvia aquest valor per fer-lo més gran o més petit */
   height: auto;
+  margin: 14px auto 0;
   background: #fff;
-  border-radius: 12px;
-  margin-bottom: 8px;
+  border-radius: 10px;
 }
