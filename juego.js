@@ -3,7 +3,7 @@
 
 // ---------- Ajustes fáciles de cambiar ----------
 var ANCHO = 600;
-var ALTO = 450;
+var ALTO = 550;
 var DURACION = 30;   // segundos de partida
 var PROB = 0.06;     // más alto = caen más narices
 var MENSAJE_FINAL = "Cada rialla compta! Ajuda els Pallapupas a seguir portant somriures als hospitals. Anima't a convertir els teus punts en somriures";
