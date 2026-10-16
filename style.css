@@ -179,3 +179,22 @@ button:active {
     max-width: clamp(340px, calc((100vh - 240px) * 0.75), 600px);
   }
 }
+
+/* Punts i conversió a euros a la pantalla final */
+.resultat-punts {
+  font-size: clamp(1.2rem, 5vw, 1.5rem);
+  font-weight: 700;
+  color: var(--red);
+}
+
+.conversio {
+  margin: 0;
+  max-width: 28ch;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* Marcador amb tres elements: una mica més compacte al mòbil */
+@media (max-width: 420px) {
+  .hud { font-size: 0.95rem; }
+}

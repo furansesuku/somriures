@@ -10,6 +10,9 @@ var ALTO = cv.height;
 cv.style.aspectRatio = ANCHO + " / " + ALTO;   // evita que els nassos es vegin ovalats
 var DURACION = 30;   // segundos de partida
 var PROB = 0.06;     // más alto = caen más narices
+// Conversió de punts a euros: cada PUNTS_PER_EURO punts = 1 €.
+// Sempre s'indiquen euros sencers (sense cèntims): 90 punts = 9 €, 95 punts = 9 €, 100 punts = 10 €.
+var PUNTS_PER_EURO = 10;
 var MENSAJE_FINAL = "Cada rialla compta! Ajuda els Pallapupas a seguir portant somriures als hospitals.";
 // Punts segons la mida del nas (radi en píxels, entre 18 i 32). Com més petit, més punts.
 // Es tria la primera fila on el radi sigui menor que "maxRadi".
@@ -25,7 +28,10 @@ var ENLACE_APADRINAR = "https://www.stockcrowd.com/p2p/1799/Apadrinaunsomriure";
 var ctx = cv.getContext("2d");
 var ov = document.getElementById("ov");
 var btn = document.getElementById("btn");
+var elRialles = document.getElementById("rialles");
 var elScore = document.getElementById("score");
+var elPuntsFinal = document.getElementById("resultatPunts");
+var elConversio = document.getElementById("conversio");
 var elTime = document.getElementById("time");
 var elResultat = document.getElementById("resultat");
 var elApadrinar = document.getElementById("apadrinar");
@@ -33,7 +39,8 @@ var elApadrinar = document.getElementById("apadrinar");
 // ---------- Estado del juego ----------
 var noses = [];
 var avisos = [];   // textos "+N" que apareixen un moment en atrapar un nas
-var score = 0;
+var rialles = 0;   // nombre de nassos atrapats
+var score = 0;     // punts (segons la mida de cada nas)
 var time = DURACION;
 var playing = false;
 var last = 0;
@@ -50,19 +57,23 @@ function puntosDe(radio) {
 }
 
 function actualizarMarcadores() {
-  elScore.textContent = "Rialles: " + score;
+  elRialles.textContent = "Rialles: " + rialles;
+  elScore.textContent = "Punts: " + score;
   elTime.textContent = "Temps: " + Math.max(0, Math.ceil(time)) + "s";
 }
 
 function empezar() {
   noses = [];
   avisos = [];
+  rialles = 0;
   score = 0;
   time = DURACION;
   playing = true;
   last = performance.now();
   ov.hidden = true;
   elResultat.hidden = true;
+  elPuntsFinal.hidden = true;
+  elConversio.hidden = true;
   elApadrinar.hidden = true;
   actualizarMarcadores();
   requestAnimationFrame(bucle);
@@ -72,8 +83,18 @@ function terminar() {
   playing = false;
   document.getElementById("title").textContent = "Temps!";
   document.getElementById("msg").textContent = MENSAJE_FINAL;
-  elResultat.textContent = "Has fet " + score + (score === 1 ? " rialla!" : " rialles!");
+  var euros = Math.floor(score / PUNTS_PER_EURO);   // sempre euros sencers, arrodonit cap avall
+  elResultat.textContent = "Has fet " + rialles + (rialles === 1 ? " rialla!" : " rialles!");
   elResultat.hidden = false;
+  elPuntsFinal.textContent = "Has aconseguit " + score + (score === 1 ? " punt" : " punts");
+  elPuntsFinal.hidden = false;
+  if (euros >= 1) {
+    elConversio.textContent = "Pots convertir els teus " + score + (score === 1 ? " punt" : " punts") +
+      " en " + euros + " \u20ac de somriures al bot\u00f3 d'aqu\u00ed sota.";
+  } else {
+    elConversio.textContent = "Amb " + PUNTS_PER_EURO + " punts o m\u00e9s podr\u00e0s convertir-los en euros de somriures. Torna-ho a provar!";
+  }
+  elConversio.hidden = false;
   elApadrinar.href = ENLACE_APADRINAR;
   elApadrinar.hidden = false;
   btn.textContent = "Tornar a jugar";
@@ -170,6 +191,7 @@ cv.addEventListener("pointerdown", function (e) {
     if (dx * dx + dy * dy <= (n.r + 6) * (n.r + 6)) {
       var punts = puntosDe(n.r);
       noses.splice(i, 1);
+      rialles++;
       score += punts;
       avisos.push({ x: n.x, y: n.y, texto: "+" + punts, vida: 0.7 });
       actualizarMarcadores();
