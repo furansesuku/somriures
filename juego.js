@@ -6,7 +6,9 @@ var ANCHO = 600;
 var ALTO = 450;
 var DURACION = 30;   // segundos de partida
 var PROB = 0.06;     // más alto = caen más narices
-var MENSAJE_FINAL = "Cada rialla compta! Ajuda els Pallapupas a seguir portant somriures als hospitals a l'enllaç de la #RiuadadeNassos a https://www.stockcrowd.com/p2p/1799/Apadrinaunsomriure.";
+var MENSAJE_FINAL = "Cada rialla compta! Ajuda els Pallapupas a seguir portant somriures als hospitals. Anima't a convertir els teus punts en somriures";
+// Enllaç del botó "Apadrina": canvia-ho pel teu enllaç quan el tinguis
+var ENLACE_APADRINAR = "https://www.stockcrowd.com/p2p/1799/Apadrinaunsomriure";
 
 // ---------- Elementos de la página ----------
 var cv = document.getElementById("cv");
@@ -15,6 +17,8 @@ var ov = document.getElementById("ov");
 var btn = document.getElementById("btn");
 var elScore = document.getElementById("score");
 var elTime = document.getElementById("time");
+var elResultat = document.getElementById("resultat");
+var elApadrinar = document.getElementById("apadrinar");
 
 // ---------- Estado del juego ----------
 var noses = [];
@@ -39,6 +43,8 @@ function empezar() {
   playing = true;
   last = performance.now();
   ov.hidden = true;
+  elResultat.hidden = true;
+  elApadrinar.hidden = true;
   actualizarMarcadores();
   requestAnimationFrame(bucle);
 }
@@ -46,8 +52,11 @@ function empezar() {
 function terminar() {
   playing = false;
   document.getElementById("title").textContent = "Temps!";
-  document.getElementById("msg").textContent =
-    "Has aconseguit " + score + " rialles. " + MENSAJE_FINAL;
+  document.getElementById("msg").textContent = MENSAJE_FINAL;
+  elResultat.textContent = "Has fet " + score + (score === 1 ? " rialla!" : " rialles!");
+  elResultat.hidden = false;
+  elApadrinar.href = ENLACE_APADRINAR;
+  elApadrinar.hidden = false;
   btn.textContent = "Tornar a jugar";
   ov.hidden = false;
 }

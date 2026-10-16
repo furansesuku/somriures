@@ -110,3 +110,36 @@ button {
 button:active {
   transform: scale(0.97);
 }
+
+/* Resultat final (nombre de rialles) */
+.resultat {
+  margin: 0;
+  font-size: clamp(1.6rem, 7vw, 2.2rem);
+  font-weight: 800;
+  color: var(--fg);
+}
+
+.resultat[hidden] {
+  display: none;
+}
+
+/* Enllaç amb aspecte de botó (apadrinar) */
+.boto {
+  display: inline-block;
+  text-decoration: none;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boto[hidden] {
+  display: none;
+}
+
+.boto-apadrinar {
+  background: transparent;
+  color: var(--red);
+  border: 3px solid var(--red);
+}
