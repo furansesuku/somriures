@@ -170,3 +170,12 @@ button:active {
   .msg { font-size: 0.95rem; }
   button, .boto { padding: 10px 22px; font-size: 1rem; }
 }
+
+/* Ordinador / pantalles grans: el joc s'adapta a l'alçada de la finestra
+   perquè es vegi sencer (marcador, joc i logo) sense haver de fer scroll. */
+@media (min-width: 700px) {
+  .wrap {
+    /* 240px = espai del marcador, el logo i els marges. Mida mínima 340px, màxima 600px. */
+    max-width: clamp(340px, calc((100vh - 240px) * 0.75), 600px);
+  }
+}
