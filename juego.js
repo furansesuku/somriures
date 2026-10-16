@@ -3,12 +3,19 @@
 
 // ---------- Ajustes fáciles de cambiar ----------
 var ANCHO = 600;
-var ALTO = 720;
+var ALTO = 700;
 var DURACION = 30;   // segundos de partida
 var PROB = 0.06;     // más alto = caen más narices
-var MENSAJE_FINAL = "Cada rialla compta! Ajuda els Pallapupas a seguir portant somriures als hospitals. Anima't a convertir els teus punts en somriures";
+var MENSAJE_FINAL = "Cada rialla compta! Ajuda els Pallapupas a seguir portant somriures als hospitals.";
+// Punts segons la mida del nas (radi en píxels, entre 18 i 32). Com més petit, més punts.
+// Es tria la primera fila on el radi sigui menor que "maxRadi".
+var PUNTS_PER_MIDA = [
+  { maxRadi: 23, punts: 3 },   // nassos petits
+  { maxRadi: 28, punts: 2 },   // nassos mitjans
+  { maxRadi: 999, punts: 1 }   // nassos grans
+];
 // Enllaç del botó "Apadrina": canvia-ho pel teu enllaç quan el tinguis
-var ENLACE_APADRINAR = "https://www.stockcrowd.com/p2p/1799/Apadrinaunsomriure";
+var ENLACE_APADRINAR = "https://EL-TEU-ENLLAC-AQUI";
 
 // ---------- Elementos de la página ----------
 var cv = document.getElementById("cv");
@@ -22,6 +29,7 @@ var elApadrinar = document.getElementById("apadrinar");
 
 // ---------- Estado del juego ----------
 var noses = [];
+var avisos = [];   // textos "+N" que apareixen un moment en atrapar un nas
 var score = 0;
 var time = DURACION;
 var playing = false;
@@ -31,6 +39,13 @@ function css(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
+function puntosDe(radio) {
+  for (var i = 0; i < PUNTS_PER_MIDA.length; i++) {
+    if (radio < PUNTS_PER_MIDA[i].maxRadi) return PUNTS_PER_MIDA[i].punts;
+  }
+  return 1;
+}
+
 function actualizarMarcadores() {
   elScore.textContent = "Rialles: " + score;
   elTime.textContent = "Temps: " + Math.max(0, Math.ceil(time)) + "s";
@@ -38,6 +53,7 @@ function actualizarMarcadores() {
 
 function empezar() {
   noses = [];
+  avisos = [];
   score = 0;
   time = DURACION;
   playing = true;
@@ -93,6 +109,12 @@ function bucle(t) {
     if (noses[i].y - noses[i].r > ALTO) noses.splice(i, 1);
   }
 
+  for (var k = avisos.length - 1; k >= 0; k--) {
+    avisos[k].vida -= dt;
+    avisos[k].y -= 30 * dt;
+    if (avisos[k].vida <= 0) avisos.splice(k, 1);
+  }
+
   actualizarMarcadores();
   dibujar();
   requestAnimationFrame(bucle);
@@ -120,6 +142,15 @@ function dibujar() {
     ctx.fillStyle = brillo;
     ctx.fill();
   });
+
+  ctx.font = "bold 24px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  avisos.forEach(function (a) {
+    ctx.globalAlpha = Math.max(0, Math.min(1, a.vida / 0.5));
+    ctx.fillStyle = css("--fg");
+    ctx.fillText(a.texto, a.x, a.y);
+  });
+  ctx.globalAlpha = 1;
 }
 
 // Clic o toque sobre una nariz
@@ -134,8 +165,10 @@ cv.addEventListener("pointerdown", function (e) {
     var dx = x - n.x;
     var dy = y - n.y;
     if (dx * dx + dy * dy <= (n.r + 6) * (n.r + 6)) {
+      var punts = puntosDe(n.r);
       noses.splice(i, 1);
-      score++;
+      score += punts;
+      avisos.push({ x: n.x, y: n.y, texto: "+" + punts, vida: 0.7 });
       actualizarMarcadores();
       break;
     }
