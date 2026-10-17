@@ -8,19 +8,23 @@ var cv = document.getElementById("cv");
 var ANCHO = cv.width;
 var ALTO = cv.height;
 cv.style.aspectRatio = ANCHO + " / " + ALTO;   // evita que els nassos es vegin ovalats
-var DURACION = 30;   // segundos de partida
-var PROB = 0.06;     // más alto = caen más narices
+var DURACION = 45;   // segundos de partida (igual para todos)
+var TEMPS_APARICIO = 42;   // les narius apareixen durant aquests segons; l'última té temps de caure
 // Conversió de punts a euros: cada PUNTS_PER_EURO punts = 1 €.
 // Sempre s'indiquen euros sencers (sense cèntims): 90 punts = 9 €, 95 punts = 9 €, 100 punts = 10 €.
 var PUNTS_PER_EURO = 10;
 var MENSAJE_FINAL = "Cada rialla compta! Ajuda els Pallapupas a seguir portant somriures als hospitals.";
-// Punts segons la mida del nas (radi en píxels, entre 18 i 32). Com més petit, més punts.
-// Es tria la primera fila on el radi sigui menor que "maxRadi".
-var PUNTS_PER_MIDA = [
-  { maxRadi: 23, punts: 3 },   // nassos petits
-  { maxRadi: 28, punts: 2 },   // nassos mitjans
-  { maxRadi: 999, punts: 1 }   // nassos grans
-];
+// Cada partida té SEMPRE els mateixos nassos (sumen 300 punts exactes), en ordre aleatori.
+// punts: valor del nas. quantitat: quants en surten per partida.
+// radiMin/radiMax: mida (com més petit, més punts). vMin/vMax: velocitat de caiguda en píxels per segon.
+// Per canviar la dificultat, toca les velocitats (vMin/vMax), sobretot les dels de +3.
+var TIPUS_NASSOS = [
+  { punts: 3, quantitat: 66, radiMin: 18, radiMax: 22.9, vMin: 230, vMax: 290 },   // petits i ràpids
+  { punts: 2, quantitat: 39, radiMin: 23, radiMax: 27.9, vMin: 150, vMax: 190 },   // mitjans
+  { punts: 1, quantitat: 24, radiMin: 28, radiMax: 32,   vMin: 100, vMax: 130 }    // grans i lents
+];                                   // 66*3 + 39*2 + 24*1 = 300 punts
+var MAX_RAPIDS_SEGUITS = 2;          // com a màxim 2 nassos de +3 seguits
+var DIST_MIN_X = 110;                // distància horitzontal mínima respecte al nas anterior
 // Enllaç del botó "Apadrina": canvia-ho pel teu enllaç quan el tinguis
 var ENLACE_APADRINAR = "https://www.stockcrowd.com/p2p/1799/Apadrinaunsomriure";
 
@@ -44,16 +48,67 @@ var score = 0;     // punts (segons la mida de cada nas)
 var time = DURACION;
 var playing = false;
 var last = 0;
+var cua = [];       // nassos de la partida, en ordre d'aparició
+var horaris = [];   // segon de la partida en què surt cada nas
+var seguent = 0;    // índex del proper nas que ha de sortir
+var darreraX = -1000;
 
 function css(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-function puntosDe(radio) {
-  for (var i = 0; i < PUNTS_PER_MIDA.length; i++) {
-    if (radio < PUNTS_PER_MIDA[i].maxRadi) return PUNTS_PER_MIDA[i].punts;
+// Prepara la partida: llista de nassos (barrejada) i hora d'aparició de cadascun
+function prepararPartida() {
+  var maxPunts = TIPUS_NASSOS[0].punts;
+  var llista = [];
+  // Sorteja l'ordre: a cada posició s'escull un tipus a l'atzar (segons els que queden),
+  // però mai més de MAX_RAPIDS_SEGUITS nassos de +3 seguits. Si no quadra, es torna a provar.
+  for (var intent = 0; intent < 100; intent++) {
+    var queden = TIPUS_NASSOS.map(function (t) { return t.quantitat; });
+    var total = queden.reduce(function (x, y) { return x + y; }, 0);
+    var seguits = 0;
+    llista = [];
+    var ok = true;
+    while (total > 0) {
+      var pes = queden.map(function (q, idx) {
+        return (TIPUS_NASSOS[idx].punts === maxPunts && seguits >= MAX_RAPIDS_SEGUITS) ? 0 : q;
+      });
+      var suma = pes.reduce(function (x, y) { return x + y; }, 0);
+      if (suma === 0) { ok = false; break; }
+      var sorteig = Math.random() * suma, triat = 0;
+      while (sorteig >= pes[triat]) { sorteig -= pes[triat]; triat++; }
+      queden[triat]--; total--;
+      llista.push(TIPUS_NASSOS[triat]);
+      seguits = (TIPUS_NASSOS[triat].punts === maxPunts) ? seguits + 1 : 0;
+    }
+    if (ok) break;
   }
-  return 1;
+  cua = llista;
+  // Aparicions repartides a intervals regulars, amb una mica de variació
+  var interval = TEMPS_APARICIO / llista.length;
+  horaris = [];
+  for (var n = 0; n < llista.length; n++) {
+    horaris.push((n + 0.5 + (Math.random() - 0.5) * 0.6) * interval);
+  }
+  seguent = 0;
+  darreraX = -1000;
+}
+
+function crearNas(tipus) {
+  var r = tipus.radiMin + Math.random() * (tipus.radiMax - tipus.radiMin);
+  var x = 0;
+  for (var intent = 0; intent < 10; intent++) {
+    x = r + Math.random() * (ANCHO - 2 * r);
+    if (Math.abs(x - darreraX) >= DIST_MIN_X) break;
+  }
+  darreraX = x;
+  noses.push({
+    x: x,
+    y: -r,
+    r: r,
+    v: tipus.vMin + Math.random() * (tipus.vMax - tipus.vMin),   // px per segon
+    punts: tipus.punts
+  });
 }
 
 function actualizarMarcadores() {
@@ -68,6 +123,7 @@ function empezar() {
   rialles = 0;
   score = 0;
   time = DURACION;
+  prepararPartida();
   playing = true;
   last = performance.now();
   ov.hidden = true;
@@ -128,20 +184,16 @@ function bucle(t) {
     return;
   }
 
-  // Aparece una nariz nueva de vez en cuando
-  if (Math.random() < PROB * dt * 33) {
-    var r = 18 + Math.random() * 14;
-    noses.push({
-      x: r + Math.random() * (ANCHO - 2 * r),
-      y: -r,
-      r: r,
-      v: 2 + Math.random() * 3
-    });
+  // Surten els nassos segons l'horari de la partida
+  var transcorregut = DURACION - time;
+  while (seguent < cua.length && transcorregut >= horaris[seguent]) {
+    crearNas(cua[seguent]);
+    seguent++;
   }
 
   // Mover las narices y quitar las que salen por abajo
   for (var i = noses.length - 1; i >= 0; i--) {
-    noses[i].y += noses[i].v * dt * 33;
+    noses[i].y += noses[i].v * dt;
     if (noses[i].y - noses[i].r > ALTO) noses.splice(i, 1);
   }
 
@@ -201,7 +253,7 @@ cv.addEventListener("pointerdown", function (e) {
     var dx = x - n.x;
     var dy = y - n.y;
     if (dx * dx + dy * dy <= (n.r + 6) * (n.r + 6)) {
-      var punts = puntosDe(n.r);
+      var punts = n.punts;
       noses.splice(i, 1);
       rialles++;
       score += punts;

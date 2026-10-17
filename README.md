@@ -1,14 +1,15 @@
 # Somriures · Riuada de nassos
 
 Joc solidari de la campanya **#Riuadadenassos** a favor dels **Pallapupas** (pallassos d'hospital).
-Cauen nassos vermells per la pantalla: cal atrapar-ne tants com es pugui en 30 segons.
+Cauen nassos vermells per la pantalla: cal atrapar-ne tants com es pugui en 45 segons.
 En acabar, el joc proposa convertir els punts en euros i porta a la pàgina d'aportació de la campanya.
 
 ## Com es juga
 
 - Fes clic (o toca amb el dit) als nassos abans que arribin a baix.
 - **Rialles** = nombre de nassos atrapats.
-- **Punts** = els nassos petits valen més: 3 punts (petits), 2 (mitjans), 1 (grans).
+- **Punts** = els nassos petits valen més: 3 punts (petits i ràpids), 2 (mitjans), 1 (grans i lents).
+- Cada partida surten sempre 129 nassos (66 de +3, 39 de +2 i 24 de +1) en ordre aleatori: el màxim possible és sempre **300 punts**.
 - En acabar, el joc mostra els punts i els euros equivalents: **10 punts = 1 €**, sempre en euros sencers
   (arrodonit cap avall: 90 punts = 9 €, 95 punts = 9 €, 100 punts = 10 €).
 - Es pot desar el nom a la **classificació** (posicions de l'1 al 7).
@@ -57,9 +58,8 @@ Per aturar el servidor: `pkill -f "server.py"`.
 ## Què es pot ajustar
 
 **`juego.js`** (al principi del fitxer):
-- `DURACION`: segons de la partida (30).
-- `PROB`: quants nassos cauen (més alt = més nassos).
-- `PUNTS_PER_MIDA`: punts segons la mida del nas.
+- `DURACION`: segons de la partida (45) i `TEMPS_APARICIO`: durant quants segons surten nassos (42).
+- `TIPUS_NASSOS`: quants nassos de cada valor (+1, +2, +3), la seva mida i la seva velocitat de caiguda (px/s). Aquí es toca la dificultat.
 - `PUNTS_PER_EURO`: punts necessaris per cada euro (10).
 - `ENLACE_APADRINAR`: enllaç del botó "Apadrina un somriure".
 - `MENSAJE_FINAL`: missatge de la pantalla final.
@@ -98,14 +98,18 @@ Per aturar el servidor: `pkill -f "server.py"`.
    - Al mòbil la pantalla final no es retalla (el contingut es desplaça si no hi cap).
    - A l'ordinador, el joc s'adapta a l'alçada de la finestra per veure's sencer.
 10. **Memòria cau del navegador.** Algunes còpies antigues del CSS i del JS es quedaven guardades al
-    mòbil. Per això `index.html` carrega els fitxers amb un número de versió (`style.css?v=9`,
-    `juego.js?v=9`): cada cop que es canviï algun fitxer, cal pujar aquest número.
+    mòbil. Per això `index.html` carrega els fitxers amb un número de versió (`style.css?v=10`,
+    `juego.js?v=10`): cada cop que es canviï algun fitxer, cal pujar aquest número.
 11. **Classificació (la modificació més gran).** `python -m http.server` només serveix fitxers i no
     pot desar dades, així que s'ha creat `server.py`, que el substitueix:
     - Serveix el joc igual que abans i afegeix una API (`GET` i `POST` a `/api/ranking`).
     - Guarda les puntuacions a `ranking.json` (les 100 millors) i en mostra les 7 primeres.
     - El joc demana el nom en acabar la partida, el desa i ressalta la posició aconseguida.
     - No serveix `server.py`, `ranking.json` ni fitxers ocults (com `.git`).
+
+12. **Puntuació màxima fixa (300) i partida de 45 s.** Cada partida té el mateix repartiment de nassos
+    (66 de +3, 39 de +2, 24 de +1) en ordre aleatori, així que qui els atrapa tots sempre fa 300.
+    Surten uns 3 nassos per segon; els de +3 cauen més ràpid i no en poden sortir més de 2 seguits.
 
 ## Limitacions conegudes
 
